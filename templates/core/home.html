@@ -25,6 +25,12 @@
         margin-bottom: 20px;
       }
 
+      h2,hr {
+        margin-bottom: 20px;
+        margin-top: 20px;
+
+      }
+  
       input[type="text"] {
         width: 30%;
         margin-bottom: 10px;
@@ -42,11 +48,22 @@
       form {
         margin-bottom: 20px;
       }
+
+      thead, tbody { display: block; }
+
+      tbody {
+          height: 600px;       /* Just for the demo          */
+          overflow-y: auto;    /* Trigger vertical scroll    */
+          overflow-x: hidden;  /* Hide the horizontal scroll */
+      }
+      th, td {
+        border-bottom: 1px solid #ddd;
+      }
     </style>
   </head>
   <body>
     <div id="main">
-      <h1>Coursera: collect all courses by category</h1>
+      <h1>Coursera: get information of courses by category</h1>
       <form method="GET">
         {% csrf_token %}
         <div>
@@ -66,28 +83,32 @@
       {% endif %}
       {% if courses %}
       <a href="{% url 'download_csv_file' file_name %}">Download CSV</a>
-      <h2>Courses Information</h2>
 
-      <table style="width: 100%">
-        <tr>
-          <th>course_name</th>
-          <th>instructor_name</th>
-          <th>n_students_enrolled</th>
-          <th>n_of_ratings</th>
-          <th>category_name</th>
-          <th>course_description</th>
-        </tr>
-        {% for course in courses %} 
-        <tr>
-          <td>{{ course.course_name}}</td>
-          <td>{{ course.instructor_name}}</td>
-          <td>{{ course.n_students_enrolled}}</td>
-          <td>{{ course.n_of_ratings}}</td>
-          <td>{{ course.category_name}}</td>
-          <td>{{ course.course_description}}</td>          
-        </tr>
-        {% endfor %}
-        {% endif %}        
+      <hr>
+      <h2></h2>
+      <h2>Courses Information</h2>
+      <div>
+        <table style="width: 100%">
+          <tr>
+            <th>Course name</th>
+            <th>Instructor name</th>
+            <th># students Enrolled</th>
+            <th># of Ratings</th>
+            <th>Category Dame</th>
+            <th>Course Description</th>
+          </tr>
+          {% for course in courses %} 
+          <tr>
+            <td>{{ course.course_name}}</td>
+            <td>{{ course.instructor_name}}</td>
+            <td>{{ course.n_students_enrolled}}</td>
+            <td>{{ course.n_of_ratings}}</td>
+            <td>{{ course.category_name}}</td>
+            <td>{{ course.course_description}}</td>          
+          </tr>
+          {% endfor %}
+          {% endif %}        
+      </div>
 
     </div>
   </body>
