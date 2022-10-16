@@ -1,0 +1,5 @@
+.env.*
+browser
+driver/
+files/
+__pycache__
