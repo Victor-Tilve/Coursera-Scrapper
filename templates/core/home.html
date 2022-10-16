@@ -1,62 +1,94 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Django Weather App</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Django Coursera Scraper App</title>
     <style>
-        * {
-            margin: 0;
-            box-sizing: border-box;
-            font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
-        }
+      * {
+        margin: 0;
+        box-sizing: border-box;
+        font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier,
+          monospace;
+      }
 
-        #main {
-            text-align: center;
-            padding-top: 100px;
-        }
+      #main {
+        text-align: center;
+        padding-top: 100px;
+      }
 
-        h1 {
-            margin-bottom: 20px;
-        }
+      h1 {
+        margin-bottom: 20px;
+      }
 
-        input[type='text'] {
-            width: 30%;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 2px solid black;
-        }
+      input[type="text"] {
+        width: 30%;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 2px solid black;
+      }
 
-        input[type='submit'] {
-            width: 30%;
-            padding: 5px;
-            background: black;
-            color: white;
-            text-transform: uppercase;
-        }
-        form {
-            margin-bottom: 20px;
-        }
+      input[type="submit"] {
+        width: 30%;
+        padding: 5px;
+        background: black;
+        color: white;
+        text-transform: uppercase;
+      }
+      form {
+        margin-bottom: 20px;
+      }
     </style>
-</head>
-<body>
-<div id="main">
-    <h1>Coursera: collect all courses by category </h1>
-    <form method="GET">
+  </head>
+  <body>
+    <div id="main">
+      <h1>Coursera: collect all courses by category</h1>
+      <form method="GET">
+        {% csrf_token %}
         <div>
-            <label for="category"></label>
-            <input type="text" id="category" value="{{ request.GET.category }}" placeholder="Coursera Link..." name="category"/>
+          <h5>Enter course category link</h5>
+          <label for="category"></label>
+          <input
+            type="text"
+            id="category"
+            value="{{ request.GET.category }}"
+            placeholder="Coursera Link..."
+            name="category"
+          />
         </div>
-        <input type="submit" value="Submit"/>
-    </form>
-    {% if result %}
-        <h3>{{ result.region }}</h3>
-        <h3>{{ result.dayhour }}</h3>
-        <h3>{{ result.temp_now }}</h3>
-        <h3>{{ result.weather_now }}</h3>
-    {% endif %}
-</div>
-</body>
+        <input type="submit" value="Submit" />
+      </form>
+      {% if file_name %}
+      {% endif %}
+      {% if courses %}
+      <a href="{% url 'download_csv_file' file_name %}">Download CSV</a>
+      <h2>Courses Information</h2>
+
+      <table style="width: 100%">
+        <tr>
+          <th>course_name</th>
+          <th>instructor_name</th>
+          <th>n_students_enrolled</th>
+          <th>n_of_ratings</th>
+          <th>category_name</th>
+          <th>course_description</th>
+        </tr>
+        {% for course in courses %} 
+        <tr>
+          <td>{{ course.course_name}}</td>
+          <td>{{ course.instructor_name}}</td>
+          <td>{{ course.n_students_enrolled}}</td>
+          <td>{{ course.n_of_ratings}}</td>
+          <td>{{ course.category_name}}</td>
+          <td>{{ course.course_description}}</td>          
+        </tr>
+        {% endfor %}
+        {% endif %}        
+
+    </div>
+  </body>
 </html>
