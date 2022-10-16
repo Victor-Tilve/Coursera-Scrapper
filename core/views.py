@@ -12,10 +12,10 @@ Escribe información en un archivo de texto plano
 def open_and_write_html(text: str, write_option: str = 'w', type: str = 'html'):
     if write_option == 'a':
         f = open(
-            f"/mnt/12EE7302EE72DD83/xx - Github/Coursera-Scrapper/core/inspect.{type}", "a")
+            f"files/inspect.{type}", "a")
     else:
         f = open(
-            f"/mnt/12EE7302EE72DD83/xx - Github/Coursera-Scrapper/core/inspect.{type}", "w")
+            f"files/inspect..{type}", "w")
 
     f.write(str(text))
     f.close()
