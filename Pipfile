@@ -7,8 +7,6 @@ name = "pypi"
 django = "*"
 bs4 = "*"
 requests = "*"
-gitlint = "*"
-pre-commit = "*"
 
 [dev-packages]
 autopep8 = "*"
