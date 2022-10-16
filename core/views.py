@@ -1,14 +1,21 @@
-from operator import le
+import os
 import re
+from datetime import datetime
 from django.shortcuts import render
-# from django.http import HttpRequest, HttpResponse
 from django.core.handlers.wsgi import WSGIRequest
+from django.http import HttpResponse
 import requests
 from bs4 import BeautifulSoup
+import csv
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 '''
 Escribe información en un archivo de texto plano
 '''
+
+
 def open_and_write_html(text: str, write_option: str = 'w', type: str = 'html'):
     if write_option == 'a':
         f = open(
@@ -20,18 +27,24 @@ def open_and_write_html(text: str, write_option: str = 'w', type: str = 'html'):
     f.write(str(text))
     f.close()
 
+
 '''
 Se encarga de verificar si el link es del dominio de coursera
 '''
+
+
 def coursera_url_handler(url: str):
     base_url = 'https://www.coursera.org'
     if base_url not in url:
         return (base_url + url)
     return (url)
 
+
 '''
 Se encarga de encontrar la información de un curso
 '''
+
+
 def get_attributes(course_content_parser: BeautifulSoup) -> dict:
     try:
         instructor_name = course_content_parser.find("div", attrs={
@@ -93,11 +106,14 @@ def get_attributes(course_content_parser: BeautifulSoup) -> dict:
         'course_description': course_description,
     }
 
+
 '''
 Se encarga de encontrar encontrar la ruta del curso y posteriormente obtiene los atributos
 '''
-def get_attributes_from_url(url:str):
-    
+
+
+def get_attributes_from_url(url: str):
+
     print('coursera_fixed_url')
     print(url)
     print('******************************')
@@ -107,9 +123,12 @@ def get_attributes_from_url(url:str):
     # [print(key, ':', value) for key, value in course_attributes.items()]
     return course_attributes
 
+
 '''
 Busca los cursos que se encuentran en una pagina de categoría de coursera
 '''
+
+
 def course_browser(soup: BeautifulSoup) -> list[dict]:
     course: dict()
     _courses: list[dict] = []
@@ -124,53 +143,36 @@ def course_browser(soup: BeautifulSoup) -> list[dict]:
     for rc_CollectionItem_wrapper in rc_CollectionItem_wrappers:
         rc_CollectionItem_wrapper = BeautifulSoup(
             str(rc_CollectionItem_wrapper), 'html.parser')
-        # try:
-        #     # open_and_write_html(rc_CollectionItem_wrapper.find("a",attrs={"class":"card-title-link"}).text + "-- card-title-link" + "\n","a","txt")
-        #     # open_and_write_html(rc_CollectionItem_wrapper.find("a", attrs={"class": "card-title-link"}).get('href') + "-- card-title-link" + "\n","a","txt")
-        #     print(rc_CollectionItem_wrapper.find("a",attrs={"class":"card-title-link"}).text + "-- card-title-link")
-        #     print(rc_CollectionItem_wrapper.find("a", attrs={"class": "card-title-link"}).get('href'))
-
-        #     _courses.append({
-        #         'Course Name': rc_CollectionItem_wrapper.find("a", attrs={"class": "card-title-link"}).text,
-        #     })
-            
-        #     print(_courses)
-        #     coursera_fixed_url = coursera_url_handler(rc_CollectionItem_wrapper.find(
-        #     "a", attrs={"class": "card-title-link"}).get('href'))
-        #     course = {**_courses[index], **get_attributes_from_url(coursera_fixed_url)} 
-        #     print(course)
-        #     _courses[index] = course
-        #     print(_courses)
-
-        #     index_a += 1
-        #     index += 1
-        # except:
         try:
-            # open_and_write_html(rc_CollectionItem_wrapper.find("a",attrs={"class":"CardText-link"}).text + "-- CardText-link" + "\n","a","txt")
-            # open_and_write_html(rc_CollectionItem_wrapper.find("a", attrs={"class": "CardText-link"}).get('href') + "-- CardText-link" + "\n","a","txt")
-            print(rc_CollectionItem_wrapper.find("a",attrs={"class":"CardText-link"}).text + "-- CardText-link")
-            print(rc_CollectionItem_wrapper.find("a", attrs={"class": "CardText-link"}).get('href'))
-            
+            print(rc_CollectionItem_wrapper.find("a", attrs={
+                  "class": "CardText-link"}).text + "-- CardText-link")
+            print(rc_CollectionItem_wrapper.find(
+                "a", attrs={"class": "CardText-link"}).get('href'))
+
             _courses.append({
-                'Course Name': rc_CollectionItem_wrapper.find("a", attrs={"class": "CardText-link"}).text,
+                'course_name': rc_CollectionItem_wrapper.find("a", attrs={"class": "CardText-link"}).text,
             })
             coursera_fixed_url = coursera_url_handler(rc_CollectionItem_wrapper.find(
-            "a", attrs={"class": "CardText-link"}).get('href'))
-            course = {**_courses[index], **get_attributes_from_url(coursera_fixed_url)} 
+                "a", attrs={"class": "CardText-link"}).get('href'))
+            course = {**_courses[index], **
+                      get_attributes_from_url(coursera_fixed_url)}
             _courses[index] = course
             index += 1
             index_b += 1
         except:
             print("no se encontró")
-        if index>=5:
-            [print(dictionary) for dictionary in _courses]
-            print(list(_courses))
+        if index >= 1:
+            # [print(dictionary) for dictionary in _courses]
+            # print(list(_courses))
             return _courses
     return _courses
+
 
 '''
 Obtiene le contenido de un url en especifico
 '''
+
+
 def get_html_content(url: str):
     USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36"
     LANGUAGE = "en-US,en;q=0.5"
@@ -181,30 +183,83 @@ def get_html_content(url: str):
     html_content = session.get(f'{url}').text
     return html_content
 
+
 '''
 Esta función obtiene el URL que se manda desde el request
 '''
+
+
 def get_cathegory_from_request(request: WSGIRequest):
     # TODO: validar formato de URL
     # Debe contener el dominio de coursera y antes de hacer el procesamineto, validar si la URL apunta a un lugar adecuado.
     url = request.GET.get('category')
     return url
 
+
 '''
 Función principal
 '''
+
+
 def home(request: WSGIRequest):
     result = None
     courses: list[dict] = []
-    type(request)
-    if 'category' in request.GET:
-        result = dict()
-        url = get_cathegory_from_request(request)
-        html_content = get_html_content(url)
-        from bs4 import BeautifulSoup
-        soup = BeautifulSoup(html_content, 'html.parser')
-        courses = course_browser(soup)
-        # [print(key, ':', value) for key, value in courses.items()]
+    file_name = ""
+    if request.method == "GET":
+        if 'category' in request.GET:
+            url = get_cathegory_from_request(request)
 
-    # print(courses)
-    return render(request, 'core/home.html', {'result': result})
+            if "www.coursera.org" in url:
+                url = url
+            else:
+                #TODO:make it better
+                return render(request, 'core/home.html', {'Error': "This link is not related to Coursera"})
+            #TODO: quickchech if the url exist
+            #TODO:make it better
+            url_checker = re.match(r'^(https:|)[/][/]www.([^/]+[.])*coursera.org/',url)
+
+            if url_checker:
+                print("url_checker passed")
+                html_content = get_html_content(url)
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(html_content, 'html.parser')
+                courses = course_browser(soup)
+                # df.to_csv(BASE_DIR + 'files/my_file.csv', index=False, header=True)
+                #Write the csv in in
+                file_name = datetime.strftime(datetime.now(),'%Y%m%d%H%M%S')
+                with open(os.path.join(BASE_DIR,"csv",file_name)+".csv",'w',newline='',) as infile:
+                    field_names = list(courses[0].keys())
+                    writer = csv.DictWriter(infile,field_names)
+                    writer.writeheader()
+                    writer.writerows(courses)
+                    infile.close()
+                
+                # with open(os.path.join(BASE_DIR,"csv",file_name)+".csv",'w',newline='',) as infile:
+                #     data = infile.read()
+
+                # response = HTTPResponse(data,content_type='application/vnd.ms-excel')
+                # response['Content-Disposition'] = 'attatchment;filename ="data.csv"'
+                # # [print(key, ':', value) for key, value in courses.items()]
+                # return response
+
+    #TODO:make it better
+    # file_name=file_name +".csv"
+    return render(request, 'core/home.html', {'courses': courses,'file_name':file_name})
+
+
+def download_csv_file(request,filename=''):
+    print("dentro del downloader")
+    # filename='2022-10-16-18-38-20'
+    print(filename)
+    filename = str(filename)
+    if filename != '':
+        with open(os.path.join(BASE_DIR,"csv",filename)+".csv",'r',newline='',) as infile:
+            data = infile.read()
+
+        response = HttpResponse(data, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=%s.csv' % filename
+
+        return response
+    else:
+        return render(request,'core/home.html')
+        
