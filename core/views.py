@@ -161,7 +161,10 @@ def course_browser(soup: BeautifulSoup) -> list[dict]:
             index_b += 1
         except:
             print("no se encontró")
-
+        if index >= 10:
+            # [print(dictionary) for dictionary in _courses]
+            # print(list(_courses))
+            return _courses
     return _courses
 
 
