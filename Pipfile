@@ -7,6 +7,7 @@ name = "pypi"
 django = "*"
 bs4 = "*"
 requests = "*"
+gunicorn = "==19.8.1"
 
 [dev-packages]
 autopep8 = "*"
