@@ -12,10 +12,10 @@ Escribe información en un archivo de texto plano
 def open_and_write_html(text: str, write_option: str = 'w', type: str = 'html'):
     if write_option == 'a':
         f = open(
-            f"files/inspect.{type}", "a")
+            f"inspect.{type}", "a")
     else:
         f = open(
-            f"files/inspect..{type}", "w")
+            f"inspect..{type}", "w")
 
     f.write(str(text))
     f.close()
@@ -117,7 +117,7 @@ def course_browser(soup: BeautifulSoup) -> list[dict]:
     index_a: int = 0
     index_b: int = 0
 
-    open_and_write_html("","w","txt")
+    # open_and_write_html("","w","txt")
 
     rc_CollectionItem_wrappers = soup.find_all(
         "div", attrs={"class": "rc-CollectionItem-wrapper"})
